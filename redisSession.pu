@@ -1,0 +1,22 @@
+@startuml
+User -> Browser : 로그인 페이지 접속
+Browser -> Server : POST /login
+Server -> Server : Validate User
+alt Credentials valid
+  Server -> Redis : 세션 생성
+  Redis -> Server : 세션 데이터 저장 (userID 등)
+  Server -> Browser : 세션 쿠키 설정 (sessionID)
+  Browser -> User : 프로필 페이지로 리다이렉트
+
+  User -> Browser : 프로필 페이지 요청
+  Browser -> Server : GET /profile (세션 쿠키 포함)
+  Server -> Redis : 세션 데이터 검색 (sessionID 사용)
+  Redis -> Server : 세션 데이터 반환
+  Server -> Server : 세션 데이터 사용하여 사용자 데이터 가져오기
+  Server -> Browser : 프로필 페이지 응답
+  Browser -> User : 프로필 페이지 표시
+else Credentials not valid
+  Server -> Browser : 로그인 오류 응답
+  Browser -> User : 로그인 오류 표시
+end
+@enduml
